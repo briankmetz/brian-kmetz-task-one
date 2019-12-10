@@ -37,9 +37,9 @@ export class AppComponent implements AfterViewInit{
       // generate url depending on if this feature is a state or county
       let url;
       if(feature.properties.COUNTY)
-        url = base_url + '&for=county:' + feature.properties.COUNTY + '&in=state:' + feature.properties.STATE;
+        url = base_url + '&for=county:' + feature.properties.COUNTY + '&in=state:' + feature.properties.STATE + '&key=691994fbcdf058cfe7236db1e35f507ad5dd22ba';
       else
-        url = base_url + '&for=state:' + feature.properties.STATE;
+        url = base_url + '&for=state:' + feature.properties.STATE + '&key=691994fbcdf058cfe7236db1e35f507ad5dd22ba';
       
       // make API call and then inject popup content
       http_client.get(url)
@@ -75,7 +75,7 @@ export class AppComponent implements AfterViewInit{
                       '&middot; Map data: <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
                       '&middot; This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau.';
     L.tileLayer(host, {
-      id: '39-degrees-task-a154e993',
+      id: 'aws-task-one-39-degrees-6f43311a',
       attribution: attribution
     }).addTo(myMap);
     myMap.attributionControl.setPrefix(false);
