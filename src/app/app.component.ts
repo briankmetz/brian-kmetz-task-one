@@ -29,22 +29,27 @@ export class AppComponent implements AfterViewInit{
     var http_client = this.http;
     var base_url = 'https://api.census.gov/data/2013/language?get=LAN7,LANLABEL&EST=0:1000000000'
     var injectApiData = function(popup, feature) {
+      // if API data has already been injected for this popup then no need to call it again
+      if(popup.getContent() != 'Loading...'){
+        return;
+      }
+      
       // generate url depending on if this feature is a state or county
       let url;
       if(feature.properties.COUNTY)
-        url = base_url + '&for=county:' + feature.properties.COUNTY + '&in=state:' + feature.properties.STATE
+        url = base_url + '&for=county:' + feature.properties.COUNTY + '&in=state:' + feature.properties.STATE;
       else
-        url = base_url + '&for=state:' + feature.properties.STATE
+        url = base_url + '&for=state:' + feature.properties.STATE;
       
       // make API call and then inject popup content
       http_client.get(url)
         .subscribe((data: any[]) => {
           if(!data){
-            popup.setContent('<h1>'+feature.properties.NAME+'</h1><p><b>Data Unavailable</b><br>This likely occured because tabulations are only kept for counties with 100,000 or more total population and 25,000 or more speakers of languages other than English and Spanish.</p>')
+            popup.setContent('<h1>'+feature.properties.NAME+'</h1><p><b>Data Unavailable</b><br>This likely occured because tabulations are only kept for counties with 100,000 or more total population and 25,000 or more speakers of languages other than English and Spanish.</p>');
             return;
           }
           // name of state or county
-          var popupContent = '<h1>'+feature.properties.NAME+'</h1><p>'
+          var popupContent = '<h1>'+feature.properties.NAME+'</h1><p>';
           
           // hardcoding the indicies would probably be fine but just in case the columns returns in an unexpected order...
           var labelIndex = data[0].indexOf('LANLABEL');
@@ -52,12 +57,12 @@ export class AppComponent implements AfterViewInit{
           
           // add each LAN7 result to the popup html
           for(var i = 1; i < data.length; i++){
-            popupContent += '<b>'+data[i][labelIndex]+':</b> '+data[i][populationIndex]+'<br>'
+            popupContent += '<b>'+data[i][labelIndex]+':</b> '+data[i][populationIndex]+'<br>';
           }
-          popupContent += '</p>'
+          popupContent += '</p>';
           
           // push to the popup
-          popup.setContent(popupContent)
+          popup.setContent(popupContent);
         })
     }
     
@@ -103,7 +108,7 @@ export class AppComponent implements AfterViewInit{
         invisibleCounties = L.geoJSON(US_Counties, {
             pane: 'invisibleCountiesPane',
             onEachFeature: function (feature, layer) {
-              layer.bindPopup();
+              layer.bindPopup("Loading...");
               layer.on('popupopen', function (e) { // API call only made when popup is opened, not when it is instantiated
                 injectApiData(e.popup, feature);
               })
@@ -113,7 +118,7 @@ export class AppComponent implements AfterViewInit{
         states = L.geoJSON(US_States, {
             pane: 'statesPane',
             onEachFeature: function (feature, layer) {
-              layer.bindPopup();
+              layer.bindPopup("Loading...");
               layer.on('popupopen', function (e) { // API call only made when popup is opened, not when it is instantiated
                 injectApiData(e.popup, feature);
               })
